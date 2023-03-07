@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Boss is ERC721, Ownable {
     bool minted = false;
-    int256 public health = 180;
+    int256 public health = 5000;
     address public caller;
     bool gameWon = false;
     event GameWon();

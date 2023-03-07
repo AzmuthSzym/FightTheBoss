@@ -27,7 +27,11 @@ contract Fighters is ERC721, ERC721Burnable, Ownable {
     constructor() ERC721("TEST", "TEST") {}
 
     function _baseURI() internal pure override returns (string memory) {
-        return "ipfs://QmTtZBbLRN7a7LBKr2NijfBnUS2p4Tf1BpEhmB1sc2hQHU/";
+        return "ipfs://QmU6SBB9rSGfKhz5HoftRkRz5J28QmNQJJvcguwD7DHq6E";
+    }
+
+    function tokenURI(uint256 tokenId) public pure override returns (string memory) {
+        return _baseURI();
     }
 
     function setBossContractAddress(address _address) external onlyOwner {
@@ -45,8 +49,10 @@ contract Fighters is ERC721, ERC721Burnable, Ownable {
     function attack(uint8 tokenId) public {
         require(ownerOf(tokenId) == msg.sender, "ERROR");
         require(fighters[tokenId].timestamp + 5 minutes < block.timestamp,"Fighter is on cooldown");
-        fighters[tokenId].timestamp = block.timestamp;
+        // Attack is increased by two, this will be changed after random value is added
+        fighters[tokenId].power += 2;
         fighters[tokenId].attacksAmt += 1;
+        fighters[tokenId].timestamp = block.timestamp;
         bossContract.decreaseHealth(fighters[tokenId].power);
         emit Attack(tokenId);
     }
