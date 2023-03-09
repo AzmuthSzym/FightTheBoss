@@ -7,13 +7,13 @@ Fighters can be minted by users and used to attack the boss (there is a cooldown
 The amount of attacks that every fighter performed is counted.
 Whoever attacks the last wins the main prize, but there will be smaller prizes for the fighters with most attacks performed.
 
-# Testing 
+## Testing 
 To test the contracts you need to use the command:
 ```
 npx hardhat test --network hardhat
 ```
 
-# TODO:
-1. Add tests
+## TODO:
+1. Add tests to contracts
 2. Increase power of the fighter after attack
 3. Add luck factor to attack to randomize it
