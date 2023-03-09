@@ -30,7 +30,7 @@ contract Fighters is ERC721, ERC721Burnable, Ownable {
         return "ipfs://QmU6SBB9rSGfKhz5HoftRkRz5J28QmNQJJvcguwD7DHq6E";
     }
 
-    function tokenURI(uint256 tokenId) public pure override returns (string memory) {
+    function tokenURI(uint256 ) public pure override returns (string memory) {
         return _baseURI();
     }
 

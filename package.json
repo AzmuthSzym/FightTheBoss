@@ -14,11 +14,13 @@
     "@nomiclabs/hardhat-etherscan": "^3.1.6",
     "@openzeppelin/hardhat-upgrades": "^1.22.1",
     "ethers": "^5.0.0",
-    "hardhat": "^2.12.7"
+    "hardhat": "^2.12.7",
+    "solidity-coverage": "^0.8.2"
   },
   "dependencies": {
     "@nomicfoundation/hardhat-toolbox": "^2.0.1",
     "@openzeppelin/contracts": "^4.8.1",
-    "dotenv": "^16.0.3"
+    "dotenv": "^16.0.3",
+    "ganache-cli": "^6.12.2"
   }
 }
