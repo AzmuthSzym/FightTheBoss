@@ -5,13 +5,8 @@ const {
 const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const { expect } = require("chai");
 
-describe("Fighters Test", function () {
-  // We define a fixture to reuse the same setup in every test.
-  // We use loadFixture to run this setup once, snapshot that state,
-  // and reset Hardhat Network to that snapshot in every test.
+describe("Contract Tests", function () {
   async function deployFighters() {
-
-    // Contracts are deployed using the first signer/account by default
     const [owner, otherAccount] = await ethers.getSigners();
 
     const Fighters = await ethers.getContractFactory("Fighters");
@@ -20,11 +15,21 @@ describe("Fighters Test", function () {
     return { fighters, owner, otherAccount };
   }
 
-  describe("Deployment", function () {
+  async function deployBoss()
+  {
+    const [owner, otherAccount] = await ethers.getSigners();
+
+    const Boss = await ethers.getContractFactory("Boss");
+    const boss = await Boss.deploy();
+
+    return { boss, owner, otherAccount };    
+  }
+
+  describe("Fighters Deployment", function () {
     it("Should set the right name of the NFT", async function () {
       const { fighters } = await loadFixture(deployFighters);
 
-      expect(await fighters.name()).to.equal("TEST");
+      expect(await fighters.name()).to.equal("FGHT");
     });
 
     it("Should set the right owner", async function () {
@@ -33,4 +38,76 @@ describe("Fighters Test", function () {
       expect(await fighters.owner()).to.equal(owner.address);
     });
   });
+
+  describe("Fighters Mint", function () {
+    it("Should mint NFT to the owner", async function () {
+      const { fighters, owner } = await loadFixture(deployFighters);
+
+      await expect(fighters.safeMint(owner.address)).to.emit(fighters, "Mint").withArgs(owner.address);
+    });
+
+    it("Should create fighter in the 'fighters' array", async function () {
+      const { fighters, owner } = await loadFixture(deployFighters);
+      
+      await fighters.safeMint(owner.address);
+      const mintedFighter = await fighters.fighters(0);
+      //console.log(mintedFighter['id']);
+      expect(mintedFighter['id']).to.equal(0);
+      expect(mintedFighter['power']).to.equal(100);
+      expect(mintedFighter['attacksAmt']).to.equal(0);
+      
+    });
+  });
+
+  describe("Fighters initalization", function () {
+    it("Should set the correct Boss contract address", async function () {
+      const { fighters, owner } = await loadFixture(deployFighters);
+      const { boss } = await loadFixture(deployBoss);
+
+      //console.log("Fighters owner: ", await fighters.owner());
+      //console.log("Boss contract address: ", boss.address);
+
+      //await fighters.connect(otherAccount).setBossContractAddress(boss.address);
+      await fighters.setBossContractAddress(boss.address);
+      const BossCA = await fighters.bossContract();
+      
+      expect(boss.address).to.equal(BossCA);
+    });
+  });
+
+  describe("Fighter attack", function () {
+    it("Should attack the Boss", async function () {
+      const { fighters, owner } = await loadFixture(deployFighters);
+      const { boss } = await loadFixture(deployBoss);
+
+      //Minting NFT
+      await fighters.safeMint(owner.address);
+
+      //Initializing Boss CA
+      await fighters.setBossContractAddress(boss.address);
+      const BossCA = await fighters.bossContract();
+      
+      //Wait 5 seconds for the cooldown to wear off
+      await time.increase(5);
+
+      //Attacking using the NFT
+      await fighters.connect(owner).attack(0);
+
+      expect(await boss.health()).to.equal(4900);
+    });
+  }); 
+
+  describe("Boss Deployment", function () {
+    it("Should set the right name of the NFT", async function () {
+      const { boss } = await loadFixture(deployBoss);
+
+      expect(await boss.name()).to.equal("BOSS");
+    });
+
+    it("Should set the right owner", async function () {
+      const { boss, owner } = await loadFixture(deployBoss);
+
+      expect(await boss.owner()).to.equal(owner.address);
+    });
+  });  
 });

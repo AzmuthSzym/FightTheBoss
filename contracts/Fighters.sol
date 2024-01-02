@@ -11,49 +11,52 @@ contract BossInterface {
 }
 contract Fighters is ERC721, ERC721Burnable, Ownable {
     event Attack(uint8 tokenId);
-    BossInterface bossContract;
+    event Mint(address owner);
+
+    BossInterface public bossContract;
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIdCounter;
     uint8 maxSupply = 255;
 
     struct Fighter{
         uint8 id;
-        int8 power;
-        int16 attacksAmt;
-        uint timestamp;
+        int16 power;
+        int8 attacksAmt;
+        uint lastAttack;
     }
     Fighter[] public fighters;
 
-    constructor() ERC721("TEST", "TEST") {}
+    constructor() ERC721("FGHT", "Fighters") {}
 
     function _baseURI() internal pure override returns (string memory) {
         return "ipfs://QmU6SBB9rSGfKhz5HoftRkRz5J28QmNQJJvcguwD7DHq6E";
     }
 
-    function tokenURI(uint256 ) public pure override returns (string memory) {
+    function tokenURI(uint256) public pure override returns (string memory) {
         return _baseURI();
     }
 
-    function setBossContractAddress(address _address) external onlyOwner {
+    function setBossContractAddress(BossInterface _address) external onlyOwner {
         bossContract = BossInterface(_address);
     }
 
     function safeMint(address to) public {
         require(_tokenIdCounter.current() <= maxSupply, "Max supply reached");
         uint8 tokenId = uint8(_tokenIdCounter.current());
-        fighters.push(Fighter(tokenId, 100, 0, 0));
+        fighters.push(Fighter(tokenId, 100, 0, block.timestamp));
         _tokenIdCounter.increment();
         _safeMint(to, tokenId);
+        emit Mint(to);
     }
 
     function attack(uint8 tokenId) public {
-        require(ownerOf(tokenId) == msg.sender, "ERROR");
-        require(fighters[tokenId].timestamp + 5 minutes < block.timestamp,"Fighter is on cooldown");
+        require(ownerOf(tokenId) == msg.sender, "Only owner can initiate the attack");
+        require(fighters[tokenId].lastAttack + 5 seconds < block.timestamp,"Fighter is on cooldown");
         // Attack is increased by two, this will be changed after random value is added
+        bossContract.decreaseHealth(fighters[tokenId].power);
         fighters[tokenId].power += 2;
         fighters[tokenId].attacksAmt += 1;
-        fighters[tokenId].timestamp = block.timestamp;
-        bossContract.decreaseHealth(fighters[tokenId].power);
+        fighters[tokenId].lastAttack = block.timestamp;        
         emit Attack(tokenId);
     }
 }

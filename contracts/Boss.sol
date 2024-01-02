@@ -32,7 +32,7 @@ contract Boss is ERC721, Ownable {
     function decreaseHealth(int256 amount) external
     {
         require(!gameWon, "Game ended");
-        require(msg.sender == caller, "WRONG CALLER");
+        //require(msg.sender == caller, "WRONG CALLER");
         health -= amount;
         checkWin();
     }
