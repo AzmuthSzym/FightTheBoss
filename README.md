@@ -8,8 +8,10 @@ The amount of attacks that every fighter performed is counted.
 Whoever attacks the last wins the main prize, but there will be smaller prizes for the fighters with most attacks performed.
 
 ## Testing 
-To test the contracts you need to use the command:
+To test the contracts locally you need to use the following commands (two terminals are needed):
 ```
+npx hardhat node
+
 npx hardhat test --network hardhat
 ```
 

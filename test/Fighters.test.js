@@ -39,6 +39,14 @@ describe("Contract Tests", function () {
     });
   });
 
+  describe("Boss Deployment", function () {
+    it("Should set the right owner", async function () {
+      const { boss, owner } = await loadFixture(deployBoss);
+
+      expect(await boss.owner()).to.equal(owner.address);
+    });
+  });
+
   describe("Fighters Mint", function () {
     it("Should mint NFT to the owner", async function () {
       const { fighters, owner } = await loadFixture(deployFighters);
@@ -51,7 +59,6 @@ describe("Contract Tests", function () {
       
       await fighters.safeMint(owner.address);
       const mintedFighter = await fighters.fighters(0);
-      //console.log(mintedFighter['id']);
       expect(mintedFighter['id']).to.equal(0);
       expect(mintedFighter['power']).to.equal(100);
       expect(mintedFighter['attacksAmt']).to.equal(0);
@@ -64,10 +71,6 @@ describe("Contract Tests", function () {
       const { fighters, owner } = await loadFixture(deployFighters);
       const { boss } = await loadFixture(deployBoss);
 
-      //console.log("Fighters owner: ", await fighters.owner());
-      //console.log("Boss contract address: ", boss.address);
-
-      //await fighters.connect(otherAccount).setBossContractAddress(boss.address);
       await fighters.setBossContractAddress(boss.address);
       const BossCA = await fighters.bossContract();
       
@@ -76,16 +79,15 @@ describe("Contract Tests", function () {
   });
 
   describe("Fighter attack", function () {
-    it("Should attack the Boss", async function () {
+    it("Should attack the Boss and increase stats", async function () {
       const { fighters, owner } = await loadFixture(deployFighters);
       const { boss } = await loadFixture(deployBoss);
 
       //Minting NFT
       await fighters.safeMint(owner.address);
-
+      
       //Initializing Boss CA
       await fighters.setBossContractAddress(boss.address);
-      const BossCA = await fighters.bossContract();
       
       //Wait 5 seconds for the cooldown to wear off
       await time.increase(5);
@@ -93,21 +95,67 @@ describe("Contract Tests", function () {
       //Attacking using the NFT
       await fighters.connect(owner).attack(0);
 
+      //Boss health should be decreased
       expect(await boss.health()).to.equal(4900);
-    });
-  }); 
 
-  describe("Boss Deployment", function () {
-    it("Should set the right name of the NFT", async function () {
+      //Check fighter stats
+      const mintedFighter = await fighters.fighters(0);
+      expect(mintedFighter['power']).to.equal(102);
+      expect(mintedFighter['attacksAmt']).to.equal(1);
+    });
+
+    it("Should perform only one attack because of cooldown", async function () {
+      const { fighters, owner } = await loadFixture(deployFighters);
       const { boss } = await loadFixture(deployBoss);
 
-      expect(await boss.name()).to.equal("BOSS");
+      await fighters.safeMint(owner.address);
+      await fighters.setBossContractAddress(boss.address);
+      await time.increase(5);
+      await fighters.connect(owner).attack(0);
+
+      await expect(fighters.connect(owner).attack(0)).to.be.rejectedWith("Fighter is on cooldown");
+      expect(await boss.health()).to.equal(4900);
     });
 
-    it("Should set the right owner", async function () {
-      const { boss, owner } = await loadFixture(deployBoss);
+    it("Should perform two attacks", async function () {
+      const { fighters, owner } = await loadFixture(deployFighters);
+      const { boss } = await loadFixture(deployBoss);
 
-      expect(await boss.owner()).to.equal(owner.address);
+      await fighters.safeMint(owner.address);
+      await fighters.setBossContractAddress(boss.address);
+      await time.increase(5);
+      await fighters.connect(owner).attack(0);
+      await time.increase(5);
+      await fighters.connect(owner).attack(0);
+
+      expect(await boss.health()).to.equal(4798);
+
+      const mintedFighter = await fighters.fighters(0);
+      expect(mintedFighter['power']).to.equal(104);
+      expect(mintedFighter['attacksAmt']).to.equal(2);      
+    });    
+  });
+
+  describe("Winning the game", function () {
+    it("Should emit GameWon event", async function () {
+      const { fighters, owner } = await loadFixture(deployFighters);
+      const { boss } = await loadFixture(deployBoss);
+
+      await fighters.safeMint(owner.address);
+      await fighters.setBossContractAddress(boss.address);
+
+      await time.increase(5);
+      //Go to last attack before lethal
+      for(let i = 0; i < 36; i++)
+      {
+        await fighters.connect(owner).attack(0);
+        await time.increase(5);
+      }
+      
+      //Lethal blow
+      await expect(fighters.connect(owner).attack(0)).to.emit(boss, "GameWon");
+      expect(await boss.health()).to.below(0);
     });
-  });  
+  });
+
 });

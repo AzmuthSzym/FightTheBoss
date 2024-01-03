@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
 contract BossInterface {
-    function decreaseHealth(int256 amount) external {}
+    function decreaseHealth(uint256 amount) external {}
 }
 contract Fighters is ERC721, ERC721Burnable, Ownable {
     event Attack(uint8 tokenId);
@@ -20,7 +20,7 @@ contract Fighters is ERC721, ERC721Burnable, Ownable {
 
     struct Fighter{
         uint8 id;
-        int16 power;
+        uint8 power;
         int8 attacksAmt;
         uint lastAttack;
     }
