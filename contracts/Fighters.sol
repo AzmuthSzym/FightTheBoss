@@ -64,7 +64,7 @@ contract Fighters is ERC721, ERC721Burnable, Ownable {
         emit Attack(tokenId);
     }
 
-    function getOwnedTokens(address tokenOwner) public view returns (uint256[] memory) {
+    function getOwnedTokens(address tokenOwner) external view returns (uint256[] memory) {
         return ownedTokens[tokenOwner];
     }
 }
