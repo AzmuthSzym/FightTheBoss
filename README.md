@@ -16,6 +16,6 @@ npx hardhat test --network hardhat
 ```
 
 ## TODO:
-1. Add tests to contracts
+1. Add more tests to contracts
 2. Increase power of the fighter after attack
 3. Add luck factor to attack to randomize it

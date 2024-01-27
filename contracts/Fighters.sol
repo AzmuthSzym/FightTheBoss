@@ -18,6 +18,9 @@ contract Fighters is ERC721, ERC721Burnable, Ownable {
     Counters.Counter private _tokenIdCounter;
     uint8 maxSupply = 255;
 
+    //TODO: CHANGE THE OWNER WHILE TOKEN IS TRANSFERRED
+    mapping(address => uint256[]) private ownedTokens;
+
     struct Fighter{
         uint8 id;
         uint8 power;
@@ -43,6 +46,7 @@ contract Fighters is ERC721, ERC721Burnable, Ownable {
     function safeMint(address to) public {
         require(_tokenIdCounter.current() <= maxSupply, "Max supply reached");
         uint8 tokenId = uint8(_tokenIdCounter.current());
+        ownedTokens[to].push(tokenId);
         fighters.push(Fighter(tokenId, 100, 0, block.timestamp));
         _tokenIdCounter.increment();
         _safeMint(to, tokenId);
@@ -58,5 +62,9 @@ contract Fighters is ERC721, ERC721Burnable, Ownable {
         fighters[tokenId].attacksAmt += 1;
         fighters[tokenId].lastAttack = block.timestamp;        
         emit Attack(tokenId);
+    }
+
+    function getOwnedTokens(address tokenOwner) public view returns (uint256[] memory) {
+        return ownedTokens[tokenOwner];
     }
 }

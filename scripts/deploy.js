@@ -2,8 +2,8 @@ const hre = require("hardhat");
 
 async function main() {
 
-  const Unicorns = await hre.ethers.getContractFactory("Boss");
-  const nft = await Unicorns.deploy();
+  const Contract = await hre.ethers.getContractFactory("Fighters");
+  const nft = await Contract.deploy();
 
   await nft.deployed();
   console.log("Contract deployed to address:", nft.address);

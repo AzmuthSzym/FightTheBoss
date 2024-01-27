@@ -8,7 +8,7 @@ require("solidity-coverage");
 require("@nomicfoundation/hardhat-toolbox");
 
 const { API_URL, PRIVATE_KEY, ETHERSCAN_API_KEY } = process.env;
-/*module.exports = {
+module.exports = {
    solidity: "0.8.1",
    defaultNetwork: "goerli",
    networks: {
@@ -21,10 +21,10 @@ const { API_URL, PRIVATE_KEY, ETHERSCAN_API_KEY } = process.env;
    etherscan: {
       apiKey: ETHERSCAN_API_KEY
     }   
-}*/
+}
 
 /** @type import('hardhat/config').HardhatUserConfig */
-module.exports = {
+/*module.exports = {
   solidity: "0.8.17",
   defaultNetwork: 'localhost'
-};
+};*/
