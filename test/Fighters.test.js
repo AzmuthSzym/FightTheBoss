@@ -128,7 +128,7 @@ describe("Contract Tests", function () {
       await time.increase(5);
       await fighters.connect(owner).attack(0);
 
-      expect(await boss.health()).to.equal(14798);
+      expect(await boss.health()).to.equal(4798);
 
       const mintedFighter = await fighters.fighters(0);
       expect(mintedFighter['power']).to.equal(104);
