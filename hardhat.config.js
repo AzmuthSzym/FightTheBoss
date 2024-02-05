@@ -26,5 +26,8 @@ const { API_URL, PRIVATE_KEY, ETHERSCAN_API_KEY } = process.env;
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
   solidity: "0.8.17",
-  defaultNetwork: 'localhost'
+  networks: {
+      hardhat: {},
+  }
+//  defaultNetwork: 'localhost'
 };
