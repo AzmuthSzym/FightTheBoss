@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start-local-node": "ganache-cli -p 8545 -b 3"
+    "start-local-node": "npx hardhat node"
   },
   "keywords": [],
   "author": "",

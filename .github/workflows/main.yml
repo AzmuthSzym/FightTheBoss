@@ -11,12 +11,6 @@ jobs:
 
     timeout-minutes: 5
 
-    services:
-      ethereum:
-        image: trufflesuite/ganache-cli:latest
-        ports:
-          - 8545:8545
-
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v2
@@ -32,8 +26,8 @@ jobs:
     - name: Install Hardhat Dependencies
       run: npm install --save-dev "@nomicfoundation/hardhat-chai-matchers@^1.0.0" "@types/chai@^4.2.0" "@types/mocha@>=9.1.0" "@typechain/ethers-v5@^10.1.0" "@typechain/hardhat@^6.1.2" "chai@^4.2.0" "hardhat-gas-reporter@^1.0.8" "ts-node@>=8.0.0" "typechain@^8.1.0" "typescript@>=4.5.0"
 
-#    - name: Run Local Ethereum Node
-#      run: npm run start-local-node &  # Adjust this command based on your project setup
+    - name: Run Tests with Hardhat Network
+      run: npx hardhat test --network localhost
 
     - name: Run Tests
       run: npx hardhat test
