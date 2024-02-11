@@ -17,13 +17,14 @@ contract Fighters is ERC721, ERC721Burnable, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIdCounter;
     uint8 maxSupply = 255;
+    uint256 private nonce;
 
     //TODO: CHANGE THE OWNER WHILE TOKEN IS TRANSFERRED
     mapping(address => uint256[]) private ownedTokens;
 
     struct Fighter{
         uint8 id;
-        uint8 power;
+        uint16 power;
         int8 attacksAmt;
         uint lastAttack;
     }
@@ -53,14 +54,20 @@ contract Fighters is ERC721, ERC721Burnable, Ownable {
         emit Mint(to);
     }
 
+    function generateRandomNumber() internal returns (uint256) {
+        nonce++;
+        return uint8(uint256(keccak256(abi.encodePacked(blockhash(block.number - 1), block.timestamp, nonce))));
+    }
+
     function attack(uint8 tokenId) public {
         require(ownerOf(tokenId) == msg.sender, "Only owner can initiate the attack");
         require(fighters[tokenId].lastAttack + 5 seconds < block.timestamp,"Fighter is on cooldown");
         // Attack is increased by two, this will be changed after random value is added
+        uint256 randomNumber = generateRandomNumber();
         bossContract.decreaseHealth(fighters[tokenId].power);
-        fighters[tokenId].power += 2;
+        fighters[tokenId].power = uint16(fighters[tokenId].power + (randomNumber % 10) + 1);
         fighters[tokenId].attacksAmt += 1;
-        fighters[tokenId].lastAttack = block.timestamp;        
+        fighters[tokenId].lastAttack = block.timestamp;
         emit Attack(tokenId);
     }
 
