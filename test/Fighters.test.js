@@ -100,6 +100,7 @@ describe("Contract Tests", function () {
 
       //Check fighter stats
       const mintedFighter = await fighters.fighters(0);
+      expect(mintedFighter['power']).to.be.above(101);
       expect(mintedFighter['attacksAmt']).to.equal(1);
     });
 
@@ -140,19 +141,31 @@ describe("Contract Tests", function () {
       const { fighters, owner } = await loadFixture(deployFighters);
       const { boss } = await loadFixture(deployBoss);
 
+      let gameWonEventEmitted = false;
+
       await fighters.safeMint(owner.address);
       await fighters.setBossContractAddress(boss.address);
 
       await time.increase(5);
-      //Go to last attack before lethal
+      
       for(let i = 0; i < 36; i++)
       {
+        //Perform the attack
         await fighters.connect(owner).attack(0);
         await time.increase(5);
+
+        // Listen for GameWon event from boss contract
+        const bossFilter = boss.filters.GameWon();
+        const events = await boss.queryFilter(bossFilter);
+
+        if (events.length > 0) {
+          gameWonEventEmitted = true;
+          break; // Exit the loop if the event is emitted
+        }
       }
       
       //Lethal blow
-      await expect(fighters.connect(owner).attack(0)).to.emit(boss, "GameWon");
+      expect(gameWonEventEmitted).to.be.true;
       expect(await boss.health()).to.below(0);
     });
   });
