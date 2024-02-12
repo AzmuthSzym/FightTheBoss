@@ -17,5 +17,4 @@ npx hardhat test --network hardhat
 
 ## TODO:
 1. Add more tests to contracts
-2. Increase power of the fighter after attack
-3. Add luck factor to attack to randomize it
+2. Images for warriors (to make it a real NFT collection)
