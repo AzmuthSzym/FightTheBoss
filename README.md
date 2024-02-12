@@ -16,5 +16,6 @@ npx hardhat test --network hardhat
 ```
 
 ## TODO:
-1. Add more tests to contracts
+1. Adding more tests to contracts
 2. Images for warriors (to make it a real NFT collection)
+3. Adjustment the cooldown period
